@@ -1,60 +1,8 @@
-'''
-import lime
-import lime.lime_tabular
-import matplotlib.pyplot as plt
-from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-
-iris = load_iris()
-X = iris.data
-y = iris.target
-
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
-
-model = RandomForestClassifier(n_estimators=100, random_state=42)
-model.fit(X_train, y_train)
-
-print(f"Model Accuracy: {model.score(X_test, y_test):.2f}")
-
-explainer = lime.lime_tabular.LimeTabularExplainer(
-    training_data=X_train,
-    feature_names=iris.feature_names,
-    class_names=iris.target_names,
-    mode="classification"
-)
-
-i = 3
-sample = X_test[i]
-
-print("\nTrue class:", iris.target_names[y_test[i]])
-print("Predicted class:", iris.target_names[model.predict([sample])[0]])
-
-exp = explainer.explain_instance(
-    data_row=sample,
-    predict_fn=model.predict_proba,
-    num_features=2
-)
-
-print("\nExplanation:")
-print(exp.as_list())
-
-for label in exp.available_labels():  # only labels LIME has explanations for
-    fig = exp.as_pyplot_figure(label=label)
-    plt.title(f"Explanation for class: {iris.target_names[label]}")
-    plt.show()
-
-
-fig = exp.as_pyplot_figure()
-plt.show()
-'''
-
 import pandas as pd
 import random
+import json
 
-def split_iris_into_datasets(csv_path="iris.csv"):
+def split_iris_into_datasets(csv_path="iris.csv", output_json="iris_datasets.json"):
     # Load CSV
     df = pd.read_csv(csv_path)
 
@@ -64,9 +12,7 @@ def split_iris_into_datasets(csv_path="iris.csv"):
     virginica = df[df['Species'] == 'Iris-virginica'].sample(frac=1, random_state=44).reset_index(drop=True)
 
     datasets = []
-    used_setosa = 0
-    used_versicolor = 0
-    used_virginica = 0
+    used_setosa = used_versicolor = used_virginica = 0
 
     for i in range(15):
         # Get 3 samples from each species
@@ -78,7 +24,7 @@ def split_iris_into_datasets(csv_path="iris.csv"):
         used_versicolor += 3
         used_virginica += 3
 
-        # For the 10th entry: choose randomly among remaining of any species
+        # Randomly choose a 10th sample from any species with remaining data
         remaining_choices = []
         if used_setosa < len(setosa): remaining_choices.append(('setosa', used_setosa))
         if used_versicolor < len(versicolor): remaining_choices.append(('versicolor', used_versicolor))
@@ -96,15 +42,24 @@ def split_iris_into_datasets(csv_path="iris.csv"):
             tenth = virginica.iloc[[idx]]
             used_virginica += 1
 
-        # Combine into one dataset and shuffle
+        # Combine and shuffle
         dataset = pd.concat([s_part, v_part, g_part, tenth]).sample(frac=1).reset_index(drop=True)
         datasets.append(dataset)
 
+    # Convert to a JSON-serializable dictionary
+    datasets_json = {f"dataset_{i+1}": ds.to_dict(orient="records") for i, ds in enumerate(datasets)}
+
+    # Save to JSON file
+    with open(output_json, "w") as f:
+        json.dump(datasets_json, f, indent=4)
+
+    print(f"✅ Saved {len(datasets)} datasets to {output_json}")
+
     return datasets
 
-# Example usage:
+# Example usage
 if __name__ == "__main__":
-    all_sets = split_iris_into_datasets("iris.csv")
+    all_sets = split_iris_into_datasets("iris.csv", "iris_datasets.json")
     for i, ds in enumerate(all_sets, start=1):
         print(f"\nDataset {i}:")
         print(ds[['Id', 'Species']])
