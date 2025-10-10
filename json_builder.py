@@ -14,36 +14,21 @@ def split_iris_into_datasets(csv_path="iris.csv", output_json="iris_datasets.jso
     datasets = []
     used_setosa = used_versicolor = used_virginica = 0
 
-    for i in range(15):
+    for i in range(5):
         # Get 3 samples from each species
-        s_part = setosa.iloc[used_setosa:used_setosa + 3]
-        v_part = versicolor.iloc[used_versicolor:used_versicolor + 3]
-        g_part = virginica.iloc[used_virginica:used_virginica + 3]
+        s_part = setosa.iloc[used_setosa:used_setosa + 10]
+        v_part = versicolor.iloc[used_versicolor:used_versicolor + 10]
+        g_part = virginica.iloc[used_virginica:used_virginica + 10]
 
-        used_setosa += 3
-        used_versicolor += 3
-        used_virginica += 3
+        used_setosa += 10
+        used_versicolor += 10
+        used_virginica += 10
 
         # Randomly choose a 10th sample from any species with remaining data
-        remaining_choices = []
-        if used_setosa < len(setosa): remaining_choices.append(('setosa', used_setosa))
-        if used_versicolor < len(versicolor): remaining_choices.append(('versicolor', used_versicolor))
-        if used_virginica < len(virginica): remaining_choices.append(('virginica', used_virginica))
-
-        species_choice, idx = random.choice(remaining_choices)
-
-        if species_choice == 'setosa':
-            tenth = setosa.iloc[[idx]]
-            used_setosa += 1
-        elif species_choice == 'versicolor':
-            tenth = versicolor.iloc[[idx]]
-            used_versicolor += 1
-        else:
-            tenth = virginica.iloc[[idx]]
-            used_virginica += 1
+       
 
         # Combine and shuffle
-        dataset = pd.concat([s_part, v_part, g_part, tenth]).sample(frac=1).reset_index(drop=True)
+        dataset = pd.concat([s_part, v_part, g_part]).sample(frac=1).reset_index(drop=True)
         datasets.append(dataset)
 
     # Convert to a JSON-serializable dictionary

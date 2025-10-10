@@ -91,7 +91,7 @@ def plot_lime_dual(exp_pred, exp_actual, feature_names, dataset_num, pred_label,
 # Main
 # -----------------------------
 if __name__ == "__main__":
-    json_file = "iris_datasets.json"
+    json_file = "iris_datasets_15.json"
     drop_features = []  # drop features you don't want
 
     # Run training/testing
