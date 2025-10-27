@@ -1,3 +1,4 @@
+# Import modules needed for XGB and analysis
 import json
 import os
 import numpy as np
@@ -6,8 +7,9 @@ import matplotlib.pyplot as plt
 from xgboost import XGBClassifier
 from sklearn.preprocessing import LabelEncoder
 from lime.lime_tabular import LimeTabularExplainer
-
 import warnings
+
+# Set warning filter
 warnings.filterwarnings("ignore", category=UserWarning)
 
 # -----------------------------
@@ -39,6 +41,7 @@ def train_and_test_from_json(json_file, drop_features=None):
         model = XGBClassifier(eval_metric='mlogloss', use_label_encoder=False)
         model.fit(X_train, y_train)
 
+        # Set prediction model attributes
         y_pred = model.predict(X_test)
         acc = (y_pred[0] == y_test[0])
 
@@ -47,7 +50,7 @@ def train_and_test_from_json(json_file, drop_features=None):
         all_preds.append(y_pred[0])
         all_actuals.append(y_test[0])
         feature_importances.append(model.feature_importances_)
-
+        
         results.append({
             "dataset_name": dataset_name,
             "X_train": X_train,
