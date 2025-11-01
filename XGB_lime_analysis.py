@@ -66,7 +66,10 @@ def train_and_test_from_json(json_file, drop_features=None):
 # -----------------------------
 # Function: Plot LIME explanations
 # -----------------------------
-def plot_lime_dual(exp_pred, exp_actual, feature_names, dataset_num, pred_label, actual_label, save_dir="XGB/lime plots"):
+
+# TO-DO: NO MORE DUAL PLOTS, JUST ACTUAL PREDICTION PLOTS
+
+def plot_lime(exp_pred, exp_actual, feature_names, dataset_num, pred_label, actual_label, save_dir="XGB/lime plots"):
     features_pred, contributions_pred = zip(*exp_pred.as_list())
     features_actual, contributions_actual = zip(*exp_actual.as_list())
 
@@ -74,6 +77,7 @@ def plot_lime_dual(exp_pred, exp_actual, feature_names, dataset_num, pred_label,
     width = 0.35
 
     plt.figure(figsize=(10, 6))
+    # Green for HELPED TOWARD actual prediction, Red for WORKED AGAINST actual prediction
     plt.barh([f + " " for f in features_pred], contributions_pred, height=width, color='green', label=f'Predicted ({pred_label})')
     plt.barh([f for f in features_actual], contributions_actual, height=width, color='red', alpha=0.5, label=f'Actual ({actual_label})')
     plt.xlabel("Contribution to prediction")
@@ -83,7 +87,8 @@ def plot_lime_dual(exp_pred, exp_actual, feature_names, dataset_num, pred_label,
     plt.tight_layout()
 
     os.makedirs(save_dir, exist_ok=True)
-    plt.savefig(os.path.join(save_dir, f"{dataset_num}_lime_dual.png"))
+    # Uncomment to save the plot
+    # plt.savefig(os.path.join(save_dir, f"{dataset_num}_lime_dual.png"))
     plt.close()
 
 
@@ -117,6 +122,7 @@ if __name__ == "__main__":
         if y_pred[0] != y_test[0]:
             print(f"\n❌ {dataset_name} - Incorrect Prediction")
 
+            # Lime uses a tabular explainer that can be plotted for visual purposes
             explainer = LimeTabularExplainer(
                 training_data=X_train.values,
                 feature_names=X_train.columns.tolist(),
@@ -139,7 +145,7 @@ if __name__ == "__main__":
                 data_row=X_test.values[0],
                 predict_fn=predict_actual_proba
             )
-
+            # Plot dual LIME explanations
             plot_lime_dual(
                 exp_pred,
                 exp_actual,
