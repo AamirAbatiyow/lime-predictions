@@ -1,13 +1,13 @@
 # Import modules needed for XGB and analysis
-import json
-import os
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-from xgboost import XGBClassifier
-from sklearn.preprocessing import LabelEncoder
-from lime.lime_tabular import LimeTabularExplainer
-import warnings
+import json # Save/ load configs
+import os # Handle file paths and directories
+import numpy as np # Allows for numerical operations and arrays
+import pandas as pd # Allows for the reading of CSV files
+import matplotlib.pyplot as plt # Visualization of data and model results
+from xgboost import XGBClassifier # Decision Model
+from sklearn.preprocessing import LabelEncoder # Encode the categorial target
+from lime.lime_tabular import LimeTabularExplainer # Explains individual predictions
+import warnings # silences nosy warnings
 
 # Set warning filter
 warnings.filterwarnings("ignore", category=UserWarning)
